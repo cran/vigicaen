@@ -48,8 +48,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -60,7 +61,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -455,7 +456,15 @@ template does.</p>
 <span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a>                <span class="at">smq_scope =</span>  <span class="st">&quot;narrow&quot;</span>,</span>
 <span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a>                smq_list,</span>
 <span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a>                smq_content)</span>
-<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a>  )</span></code></pre></div>
+<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a>  )</span>
+<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a><span class="co"># ---- Set indication terms ---- ####</span></span>
+<span id="cb3-72"><a href="#cb3-72" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" tabindex="-1"></a>i_list <span class="ot">&lt;-</span></span>
+<span id="cb3-74"><a href="#cb3-74" tabindex="-1"></a> <span class="fu">list</span>(</span>
+<span id="cb3-75"><a href="#cb3-75" tabindex="-1"></a>   <span class="at">melanoma =</span> <span class="fu">c</span>(<span class="st">&quot;Malignant melanoma&quot;</span>, <span class="st">&quot;Metastatic malignant melanoma&quot;</span>),</span>
+<span id="cb3-76"><a href="#cb3-76" tabindex="-1"></a>   <span class="at">lung_cancer =</span> <span class="fu">c</span>(<span class="st">&quot;Non-small cell lung cancer&quot;</span>, <span class="st">&quot;Lung adenocarcinoma&quot;</span>)</span>
+<span id="cb3-77"><a href="#cb3-77" tabindex="-1"></a>   )</span></code></pre></div>
 </div>
 
 

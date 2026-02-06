@@ -48,8 +48,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -60,7 +61,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -391,6 +392,7 @@ management</a></li>
 <li><a href="#other-variables" id="toc-other-variables">Other
 variables</a>
 <ul>
+<li><a href="#indications" id="toc-indications">Indications</a></li>
 <li><a href="#age" id="toc-age">Age</a></li>
 <li><a href="#sex" id="toc-sex">Sex</a></li>
 <li><a href="#using-case_when" id="toc-using-case_when">Using
@@ -1065,45 +1067,92 @@ to <code>demo</code>.</p>
 <h2>Other variables</h2>
 <p>We may need to create other variables to perform our analysis, for
 example age and sex in a multivariable analysis.</p>
+<div id="indications" class="section level3">
+<h3>Indications</h3>
+<p>The <code>ind</code> table contains the indication data at the drug
+level. Indications are encoded using either MedDRA or International
+Classification of Diseases (ICD) codes. The exact ICD version depends on
+the date of the report.</p>
+<blockquote>
+<p>If you wish to perform a full search of indications, you must enclose
+terms from both MedDRA and ICD.</p>
+</blockquote>
+<p>You can add the indication columns to <code>demo</code> or other
+tables (<code>drug</code>, <code>adr</code>, <code>link</code>, or even
+<code>ind</code>) with <code>add_ind()</code>.</p>
+<p>The process is simpler than for drugs and reactions, since there is
+no <code>get_</code> step.</p>
+<p>First, load the tables and pick the indication terms of interest.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># You need ind and drug, plus the table you will be working on, here demo.</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>ind <span class="ot">&lt;-</span> ind_</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>i_list <span class="ot">&lt;-</span></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>  <span class="fu">list2</span>(</span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>    <span class="at">melanoma =</span> <span class="fu">c</span>(<span class="st">&quot;Malignant melanoma&quot;</span>, <span class="st">&quot;Metastatic malignant melanoma&quot;</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Then, run <code>add_ind()</code>.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>  <span class="fu">add_ind</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>    <span class="at">.data =</span> demo,</span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>    <span class="at">i_list =</span> i_list,</span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a>    <span class="at">drug_data =</span> drug,</span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>    <span class="at">ind_data  =</span> ind</span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a>    )</span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co">#&gt; ℹ `.data` detected as `demo` table.</span></span></code></pre></div>
+<p>As all drugs from all reports do not appear in the ind table, there
+might be missing data in the columns created with <code>add_ind()</code>
+(which couldn’t happen with <code>add_drug()</code> or
+<code>add_adr()</code>.</p>
+<p>Thus, you can’t use <code>check_dm()</code>, which doesn’t work in
+case of missing data. <code>desc_facvar()</code> will do the job
+instead.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>demo <span class="sc">|&gt;</span> </span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>  <span class="fu">desc_facvar</span>(<span class="st">&quot;melanoma&quot;</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 × 4</span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="co">#&gt;   var      level value         n_avail</span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;           &lt;int&gt;</span></span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; 1 melanoma 0     574/660 (87%)     660</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; 2 melanoma 1     86/660 (13%)      660</span></span></code></pre></div>
+</div>
 <div id="age" class="section level3">
 <h3>Age</h3>
 <p>The <code>demo</code> table contains the <code>AgeGroup</code>
 column, which groups ages into categories. You may want to recode it to
 match you research question</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">cut</span>(<span class="fu">as.integer</span>(AgeGroup),</span>
-<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>              <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>),</span>
-<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>              <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>              <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;&lt;18&quot;</span>, <span class="st">&quot;18-45&quot;</span>,<span class="st">&quot;45-64&quot;</span>, <span class="st">&quot;65-74&quot;</span>, <span class="st">&quot;75+&quot;</span>))</span>
-<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a>  )</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">cut</span>(<span class="fu">as.integer</span>(AgeGroup),</span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>              <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>),</span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a>              <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a>              <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;&lt;18&quot;</span>, <span class="st">&quot;18-45&quot;</span>,<span class="st">&quot;45-64&quot;</span>, <span class="st">&quot;65-74&quot;</span>, <span class="st">&quot;75+&quot;</span>))</span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a>  )</span></code></pre></div>
 </div>
 <div id="sex" class="section level3">
 <h3>Sex</h3>
 <p>The <code>demo</code> table contains the <code>Gender</code> column,
 from which you can also create a new sex column (with values 1 for men,
 2 for women, and NA otherwise)</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">ifelse</span>(Gender <span class="sc">==</span> <span class="st">&quot;1&quot;</span>, <span class="dv">1</span>,</span>
-<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a>                 <span class="fu">ifelse</span>(Gender <span class="sc">==</span> <span class="st">&quot;2&quot;</span>, <span class="dv">2</span>, <span class="cn">NA_real_</span>)</span>
-<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a>                 )</span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">ifelse</span>(Gender <span class="sc">==</span> <span class="st">&quot;1&quot;</span>, <span class="dv">1</span>,</span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>                 <span class="fu">ifelse</span>(Gender <span class="sc">==</span> <span class="st">&quot;2&quot;</span>, <span class="dv">2</span>, <span class="cn">NA_real_</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>                 )</span>
+<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a>    )</span></code></pre></div>
 </div>
 <div id="using-case_when" class="section level3">
 <h3>Using case_when()</h3>
 <p>The <code>case_when()</code> function from the <code>dplyr</code>
 package allows you to manage multiple options in a single function, with
 a slightly different syntax.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">case_when</span>(Gender <span class="sc">==</span> <span class="st">&quot;1&quot;</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>                    Gender <span class="sc">==</span> <span class="st">&quot;2&quot;</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a>                    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_real_</span>)</span>
-<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a>    )</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">case_when</span>(Gender <span class="sc">==</span> <span class="st">&quot;1&quot;</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>                    Gender <span class="sc">==</span> <span class="st">&quot;2&quot;</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>                    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_real_</span>)</span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>    )</span></code></pre></div>
 <p>More documentation on <code>case_when()</code> can be found in the
 <code>dplyr</code> package documentation.</p>
 <p>You should just remember here that options are evaluated
@@ -1114,37 +1163,37 @@ sequentially, from top to bottom.</p>
 <p>The <code>out</code> table contains the <code>Seriousness</code>
 column, which indicates whether the case was serious or not, and whether
 the patient experienced a fatal issue during his/her follow-up.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co"># ---- Serious ---- ####</span></span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a></span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>out <span class="ot">&lt;-</span> out_</span>
-<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a></span>
-<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
-<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
-<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a>    <span class="at">serious =</span> </span>
-<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a>      <span class="fu">ifelse</span>(</span>
-<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a>        UMCReportId <span class="sc">%in%</span> out<span class="sc">$</span>UMCReportId,</span>
-<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a>        UMCReportId <span class="sc">%in%</span> </span>
-<span id="cb24-12"><a href="#cb24-12" tabindex="-1"></a>          (out <span class="sc">|&gt;</span> </span>
-<span id="cb24-13"><a href="#cb24-13" tabindex="-1"></a>          <span class="fu">filter</span>(Serious <span class="sc">==</span> <span class="st">&quot;Y&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb24-14"><a href="#cb24-14" tabindex="-1"></a>          <span class="fu">pull</span>(UMCReportId)</span>
-<span id="cb24-15"><a href="#cb24-15" tabindex="-1"></a>          ),</span>
-<span id="cb24-16"><a href="#cb24-16" tabindex="-1"></a>        <span class="cn">NA</span>)</span>
-<span id="cb24-17"><a href="#cb24-17" tabindex="-1"></a>    )</span>
-<span id="cb24-18"><a href="#cb24-18" tabindex="-1"></a></span>
-<span id="cb24-19"><a href="#cb24-19" tabindex="-1"></a><span class="co"># ---- Death + outcome availability ---- ####</span></span>
-<span id="cb24-20"><a href="#cb24-20" tabindex="-1"></a></span>
-<span id="cb24-21"><a href="#cb24-21" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
-<span id="cb24-22"><a href="#cb24-22" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
-<span id="cb24-23"><a href="#cb24-23" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">death =</span> </span>
-<span id="cb24-24"><a href="#cb24-24" tabindex="-1"></a>           <span class="fu">ifelse</span>(UMCReportId <span class="sc">%in%</span> out<span class="sc">$</span>UMCReportId,</span>
-<span id="cb24-25"><a href="#cb24-25" tabindex="-1"></a>                  UMCReportId <span class="sc">%in%</span> </span>
-<span id="cb24-26"><a href="#cb24-26" tabindex="-1"></a>                    (out <span class="sc">|&gt;</span> </span>
-<span id="cb24-27"><a href="#cb24-27" tabindex="-1"></a>                    <span class="fu">filter</span>(Seriousness <span class="sc">==</span> <span class="st">&quot;1&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb24-28"><a href="#cb24-28" tabindex="-1"></a>                    <span class="fu">pull</span>(UMCReportId)</span>
-<span id="cb24-29"><a href="#cb24-29" tabindex="-1"></a>                    ),</span>
-<span id="cb24-30"><a href="#cb24-30" tabindex="-1"></a>                  <span class="cn">NA</span>)</span>
-<span id="cb24-31"><a href="#cb24-31" tabindex="-1"></a>         )</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="co"># ---- Serious ---- ####</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>out <span class="ot">&lt;-</span> out_</span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
+<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb27-8"><a href="#cb27-8" tabindex="-1"></a>    <span class="at">serious =</span> </span>
+<span id="cb27-9"><a href="#cb27-9" tabindex="-1"></a>      <span class="fu">ifelse</span>(</span>
+<span id="cb27-10"><a href="#cb27-10" tabindex="-1"></a>        UMCReportId <span class="sc">%in%</span> out<span class="sc">$</span>UMCReportId,</span>
+<span id="cb27-11"><a href="#cb27-11" tabindex="-1"></a>        UMCReportId <span class="sc">%in%</span> </span>
+<span id="cb27-12"><a href="#cb27-12" tabindex="-1"></a>          (out <span class="sc">|&gt;</span> </span>
+<span id="cb27-13"><a href="#cb27-13" tabindex="-1"></a>          <span class="fu">filter</span>(Serious <span class="sc">==</span> <span class="st">&quot;Y&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb27-14"><a href="#cb27-14" tabindex="-1"></a>          <span class="fu">pull</span>(UMCReportId)</span>
+<span id="cb27-15"><a href="#cb27-15" tabindex="-1"></a>          ),</span>
+<span id="cb27-16"><a href="#cb27-16" tabindex="-1"></a>        <span class="cn">NA</span>)</span>
+<span id="cb27-17"><a href="#cb27-17" tabindex="-1"></a>    )</span>
+<span id="cb27-18"><a href="#cb27-18" tabindex="-1"></a></span>
+<span id="cb27-19"><a href="#cb27-19" tabindex="-1"></a><span class="co"># ---- Death + outcome availability ---- ####</span></span>
+<span id="cb27-20"><a href="#cb27-20" tabindex="-1"></a></span>
+<span id="cb27-21"><a href="#cb27-21" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
+<span id="cb27-22"><a href="#cb27-22" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
+<span id="cb27-23"><a href="#cb27-23" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">death =</span> </span>
+<span id="cb27-24"><a href="#cb27-24" tabindex="-1"></a>           <span class="fu">ifelse</span>(UMCReportId <span class="sc">%in%</span> out<span class="sc">$</span>UMCReportId,</span>
+<span id="cb27-25"><a href="#cb27-25" tabindex="-1"></a>                  UMCReportId <span class="sc">%in%</span> </span>
+<span id="cb27-26"><a href="#cb27-26" tabindex="-1"></a>                    (out <span class="sc">|&gt;</span> </span>
+<span id="cb27-27"><a href="#cb27-27" tabindex="-1"></a>                    <span class="fu">filter</span>(Seriousness <span class="sc">==</span> <span class="st">&quot;1&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb27-28"><a href="#cb27-28" tabindex="-1"></a>                    <span class="fu">pull</span>(UMCReportId)</span>
+<span id="cb27-29"><a href="#cb27-29" tabindex="-1"></a>                    ),</span>
+<span id="cb27-30"><a href="#cb27-30" tabindex="-1"></a>                  <span class="cn">NA</span>)</span>
+<span id="cb27-31"><a href="#cb27-31" tabindex="-1"></a>         )</span></code></pre></div>
 <ul>
 <li><p>The <code>serious</code> and <code>death</code> columns are coded
 with TRUE/FALSE values in this example. There is no particular reason to
@@ -1175,15 +1224,15 @@ Odds-Ratio and its confidence interval (default: 95%CI).</p></li>
 Component, and its lower end of credibility interval (default:
 IC025).</p></li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>demo <span class="sc">|&gt;</span> </span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>  <span class="fu">compute_dispro</span>(</span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;a_colitis&quot;</span>,</span>
-<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;nivolumab&quot;</span></span>
-<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>    )</span>
-<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 9</span></span>
-<span id="cb25-7"><a href="#cb25-7" tabindex="-1"></a><span class="co">#&gt;   y         x         n_obs n_exp or    or_ci          ic ic_tail ci_level</span></span>
-<span id="cb25-8"><a href="#cb25-8" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   </span></span>
-<span id="cb25-9"><a href="#cb25-9" tabindex="-1"></a><span class="co">#&gt; 1 a_colitis nivolumab    44  31.2 1.88  (1.23-2.88) 0.489  0.0314 95%</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>demo <span class="sc">|&gt;</span> </span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>  <span class="fu">compute_dispro</span>(</span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;a_colitis&quot;</span>,</span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;nivolumab&quot;</span></span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>    )</span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a><span class="co">#&gt; # A tibble: 1 × 9</span></span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="co">#&gt;   y         x         n_obs n_exp or    or_ci          ic ic_tail ci_level</span></span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;       &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   </span></span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="co">#&gt; 1 a_colitis nivolumab    44  31.2 1.88  (1.23-2.88) 0.489  0.0314 95%</span></span></code></pre></div>
 </div>
 </div>
 <div id="advanced-modelling-multivariate-analysis" class="section level2">
@@ -1195,99 +1244,99 @@ multivariate logistic regression on the reporting of colitis and
 nivolumab, adjusted on age groups and sex.</p>
 <p>The <code>glm()</code> function from the <code>stats</code> package
 can be used for this purpose.</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(a_colitis <span class="sc">~</span> nivolumab, </span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>           <span class="at">data =</span> demo, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span>
-<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a><span class="fu">summary</span>(mod)</span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a><span class="co">#&gt; glm(formula = a_colitis ~ nivolumab, family = &quot;binomial&quot;, data = demo)</span></span>
-<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
-<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a><span class="co">#&gt; (Intercept)  -2.0477     0.1372 -14.928  &lt; 2e-16 ***</span></span>
-<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a><span class="co">#&gt; nivolumab     0.6334     0.2170   2.919  0.00351 ** </span></span>
-<span id="cb26-13"><a href="#cb26-13" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb26-14"><a href="#cb26-14" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb26-15"><a href="#cb26-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb26-16"><a href="#cb26-16" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
-<span id="cb26-17"><a href="#cb26-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb26-18"><a href="#cb26-18" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 603.80  on 749  degrees of freedom</span></span>
-<span id="cb26-19"><a href="#cb26-19" tabindex="-1"></a><span class="co">#&gt; Residual deviance: 595.53  on 748  degrees of freedom</span></span>
-<span id="cb26-20"><a href="#cb26-20" tabindex="-1"></a><span class="co">#&gt; AIC: 599.53</span></span>
-<span id="cb26-21"><a href="#cb26-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb26-22"><a href="#cb26-22" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>mod <span class="ot">&lt;-</span> <span class="fu">glm</span>(a_colitis <span class="sc">~</span> nivolumab, </span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>           <span class="at">data =</span> demo, <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="fu">summary</span>(mod)</span>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt; glm(formula = a_colitis ~ nivolumab, family = &quot;binomial&quot;, data = demo)</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)    </span></span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="co">#&gt; (Intercept)  -2.0477     0.1372 -14.928  &lt; 2e-16 ***</span></span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="co">#&gt; nivolumab     0.6334     0.2170   2.919  0.00351 ** </span></span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 603.80  on 749  degrees of freedom</span></span>
+<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="co">#&gt; Residual deviance: 595.53  on 748  degrees of freedom</span></span>
+<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="co">#&gt; AIC: 599.53</span></span>
+<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 4</span></span></code></pre></div>
 <p>In a logistic regression models, estimates lead to (reporting) OR by
 the exponential.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">summary</span>(mod)<span class="sc">$</span>coefficients</span>
-<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="co">#&gt;               Estimate Std. Error    z value     Pr(&gt;|z|)</span></span>
-<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a><span class="co">#&gt; (Intercept) -2.0476928  0.1371736 -14.927752 2.174746e-50</span></span>
-<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a><span class="co">#&gt; nivolumab    0.6333854  0.2169532   2.919456 3.506429e-03</span></span>
-<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a></span>
-<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">summary</span>(mod)<span class="sc">$</span>coefficients[<span class="dv">2</span>, <span class="dv">1</span>])</span>
-<span id="cb27-7"><a href="#cb27-7" tabindex="-1"></a><span class="co">#&gt; [1] 1.883978</span></span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">summary</span>(mod)<span class="sc">$</span>coefficients</span>
+<span id="cb30-2"><a href="#cb30-2" tabindex="-1"></a><span class="co">#&gt;               Estimate Std. Error    z value     Pr(&gt;|z|)</span></span>
+<span id="cb30-3"><a href="#cb30-3" tabindex="-1"></a><span class="co">#&gt; (Intercept) -2.0476928  0.1371736 -14.927752 2.174746e-50</span></span>
+<span id="cb30-4"><a href="#cb30-4" tabindex="-1"></a><span class="co">#&gt; nivolumab    0.6333854  0.2169532   2.919456 3.506429e-03</span></span>
+<span id="cb30-5"><a href="#cb30-5" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" tabindex="-1"></a><span class="fu">exp</span>(<span class="fu">summary</span>(mod)<span class="sc">$</span>coefficients[<span class="dv">2</span>, <span class="dv">1</span>])</span>
+<span id="cb30-7"><a href="#cb30-7" tabindex="-1"></a><span class="co">#&gt; [1] 1.883978</span></span></code></pre></div>
 <p>Adding covariates is straightforward</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(a_colitis <span class="sc">~</span> nivolumab <span class="sc">+</span> sex <span class="sc">+</span> age,</span>
-<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>            <span class="at">data =</span> demo,</span>
-<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>            <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span>
-<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a></span>
-<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a><span class="fu">summary</span>(mod2)</span>
-<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
-<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="co">#&gt; glm(formula = a_colitis ~ nivolumab + sex + age, family = &quot;binomial&quot;, </span></span>
-<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="co">#&gt;     data = demo)</span></span>
-<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
-<span id="cb28-12"><a href="#cb28-12" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)  </span></span>
-<span id="cb28-13"><a href="#cb28-13" tabindex="-1"></a><span class="co">#&gt; (Intercept) -14.8881   882.7435  -0.017   0.9865  </span></span>
-<span id="cb28-14"><a href="#cb28-14" tabindex="-1"></a><span class="co">#&gt; nivolumab     0.4613     0.2679   1.722   0.0851 .</span></span>
-<span id="cb28-15"><a href="#cb28-15" tabindex="-1"></a><span class="co">#&gt; sex           0.1610     0.2517   0.640   0.5223  </span></span>
-<span id="cb28-16"><a href="#cb28-16" tabindex="-1"></a><span class="co">#&gt; age18-45     12.7789   882.7435   0.014   0.9884  </span></span>
-<span id="cb28-17"><a href="#cb28-17" tabindex="-1"></a><span class="co">#&gt; age45-64     12.7362   882.7434   0.014   0.9885  </span></span>
-<span id="cb28-18"><a href="#cb28-18" tabindex="-1"></a><span class="co">#&gt; age65-74     13.1715   882.7434   0.015   0.9881  </span></span>
-<span id="cb28-19"><a href="#cb28-19" tabindex="-1"></a><span class="co">#&gt; age75+       12.6702   882.7434   0.014   0.9885  </span></span>
-<span id="cb28-20"><a href="#cb28-20" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
-<span id="cb28-21"><a href="#cb28-21" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
-<span id="cb28-22"><a href="#cb28-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb28-23"><a href="#cb28-23" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
-<span id="cb28-24"><a href="#cb28-24" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb28-25"><a href="#cb28-25" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 436.14  on 489  degrees of freedom</span></span>
-<span id="cb28-26"><a href="#cb28-26" tabindex="-1"></a><span class="co">#&gt; Residual deviance: 429.24  on 483  degrees of freedom</span></span>
-<span id="cb28-27"><a href="#cb28-27" tabindex="-1"></a><span class="co">#&gt;   (260 observations effacées parce que manquantes)</span></span>
-<span id="cb28-28"><a href="#cb28-28" tabindex="-1"></a><span class="co">#&gt; AIC: 443.24</span></span>
-<span id="cb28-29"><a href="#cb28-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb28-30"><a href="#cb28-30" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 13</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>mod2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(a_colitis <span class="sc">~</span> nivolumab <span class="sc">+</span> sex <span class="sc">+</span> age,</span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>            <span class="at">data =</span> demo,</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a>            <span class="at">family =</span> <span class="st">&quot;binomial&quot;</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a></span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a><span class="fu">summary</span>(mod2)</span>
+<span id="cb31-6"><a href="#cb31-6" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb31-7"><a href="#cb31-7" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb31-8"><a href="#cb31-8" tabindex="-1"></a><span class="co">#&gt; glm(formula = a_colitis ~ nivolumab + sex + age, family = &quot;binomial&quot;, </span></span>
+<span id="cb31-9"><a href="#cb31-9" tabindex="-1"></a><span class="co">#&gt;     data = demo)</span></span>
+<span id="cb31-10"><a href="#cb31-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb31-11"><a href="#cb31-11" tabindex="-1"></a><span class="co">#&gt; Coefficients:</span></span>
+<span id="cb31-12"><a href="#cb31-12" tabindex="-1"></a><span class="co">#&gt;             Estimate Std. Error z value Pr(&gt;|z|)  </span></span>
+<span id="cb31-13"><a href="#cb31-13" tabindex="-1"></a><span class="co">#&gt; (Intercept) -14.8881   882.7435  -0.017   0.9865  </span></span>
+<span id="cb31-14"><a href="#cb31-14" tabindex="-1"></a><span class="co">#&gt; nivolumab     0.4613     0.2679   1.722   0.0851 .</span></span>
+<span id="cb31-15"><a href="#cb31-15" tabindex="-1"></a><span class="co">#&gt; sex           0.1610     0.2517   0.640   0.5223  </span></span>
+<span id="cb31-16"><a href="#cb31-16" tabindex="-1"></a><span class="co">#&gt; age18-45     12.7789   882.7435   0.014   0.9884  </span></span>
+<span id="cb31-17"><a href="#cb31-17" tabindex="-1"></a><span class="co">#&gt; age45-64     12.7362   882.7434   0.014   0.9885  </span></span>
+<span id="cb31-18"><a href="#cb31-18" tabindex="-1"></a><span class="co">#&gt; age65-74     13.1715   882.7434   0.015   0.9881  </span></span>
+<span id="cb31-19"><a href="#cb31-19" tabindex="-1"></a><span class="co">#&gt; age75+       12.6702   882.7434   0.014   0.9885  </span></span>
+<span id="cb31-20"><a href="#cb31-20" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb31-21"><a href="#cb31-21" tabindex="-1"></a><span class="co">#&gt; Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</span></span>
+<span id="cb31-22"><a href="#cb31-22" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb31-23"><a href="#cb31-23" tabindex="-1"></a><span class="co">#&gt; (Dispersion parameter for binomial family taken to be 1)</span></span>
+<span id="cb31-24"><a href="#cb31-24" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb31-25"><a href="#cb31-25" tabindex="-1"></a><span class="co">#&gt;     Null deviance: 436.14  on 489  degrees of freedom</span></span>
+<span id="cb31-26"><a href="#cb31-26" tabindex="-1"></a><span class="co">#&gt; Residual deviance: 429.24  on 483  degrees of freedom</span></span>
+<span id="cb31-27"><a href="#cb31-27" tabindex="-1"></a><span class="co">#&gt;   (260 observations effacées parce que manquantes)</span></span>
+<span id="cb31-28"><a href="#cb31-28" tabindex="-1"></a><span class="co">#&gt; AIC: 443.24</span></span>
+<span id="cb31-29"><a href="#cb31-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb31-30"><a href="#cb31-30" tabindex="-1"></a><span class="co">#&gt; Number of Fisher Scoring iterations: 13</span></span></code></pre></div>
 <div id="extract-odds-ratio-with-compute_or_mod" class="section level3">
 <h3>Extract Odds-Ratio with compute_or_mod()</h3>
 <p>There are several packages that can extract the OR from a model. The
 <code>compute_or_mod()</code> function is just one of many ways to do
 it.</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>mod_or <span class="ot">&lt;-</span> </span>
-<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>  <span class="fu">compute_or_mod</span>(</span>
-<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a>    <span class="fu">summary</span>(mod2)<span class="sc">$</span>coefficients,</span>
-<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a>    <span class="at">estimate =</span> Estimate,</span>
-<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a>    <span class="at">std_er =</span> Std..Error</span>
-<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a>    )</span>
-<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a></span>
-<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a>mod_or</span>
-<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="co">#&gt;             rn    Estimate  Std..Error     z.value   Pr...z..           or</span></span>
-<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="co">#&gt;         &lt;char&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;        &lt;num&gt;</span></span>
-<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="co">#&gt; 1: (Intercept) -14.8881303 882.7435114 -0.01686575 0.98654372 3.421111e-07</span></span>
-<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="co">#&gt; 2:   nivolumab   0.4613151   0.2679460  1.72167184 0.08512898 1.586159e+00</span></span>
-<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="co">#&gt; 3:         sex   0.1610313   0.2516929  0.63979269 0.52230739 1.174722e+00</span></span>
-<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="co">#&gt; 4:    age18-45  12.7789374 882.7434818  0.01447639 0.98844992 3.546680e+05</span></span>
-<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="co">#&gt; 5:    age45-64  12.7361773 882.7434059  0.01442795 0.98848856 3.398220e+05</span></span>
-<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="co">#&gt; 6:    age65-74  13.1714980 882.7434060  0.01492109 0.98809513 5.251809e+05</span></span>
-<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="co">#&gt; 7:      age75+  12.6701788 882.7434335  0.01435318 0.98854821 3.181184e+05</span></span>
-<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a><span class="co">#&gt;       low_ci    up_ci        orl          ci ci_level signif_ror</span></span>
-<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="co">#&gt;        &lt;num&gt;    &lt;num&gt;     &lt;char&gt;      &lt;char&gt;   &lt;char&gt;      &lt;num&gt;</span></span>
-<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="co">#&gt; 1: 0.0000000      Inf       0.00  (0.00-Inf)      95%          0</span></span>
-<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a><span class="co">#&gt; 2: 0.9381463 2.681777       1.59 (0.94-2.68)      95%          0</span></span>
-<span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a><span class="co">#&gt; 3: 0.7172881 1.923873       1.17 (0.72-1.92)      95%          0</span></span>
-<span id="cb29-23"><a href="#cb29-23" tabindex="-1"></a><span class="co">#&gt; 4: 0.0000000      Inf 354,667.99  (0.00-Inf)      95%          0</span></span>
-<span id="cb29-24"><a href="#cb29-24" tabindex="-1"></a><span class="co">#&gt; 5: 0.0000000      Inf 339,822.03  (0.00-Inf)      95%          0</span></span>
-<span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a><span class="co">#&gt; 6: 0.0000000      Inf 525,180.87  (0.00-Inf)      95%          0</span></span>
-<span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a><span class="co">#&gt; 7: 0.0000000      Inf 318,118.36  (0.00-Inf)      95%          0</span></span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a>mod_or <span class="ot">&lt;-</span> </span>
+<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a>  <span class="fu">compute_or_mod</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a>    <span class="fu">summary</span>(mod2)<span class="sc">$</span>coefficients,</span>
+<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a>    <span class="at">estimate =</span> Estimate,</span>
+<span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a>    <span class="at">std_er =</span> Std..Error</span>
+<span id="cb32-6"><a href="#cb32-6" tabindex="-1"></a>    )</span>
+<span id="cb32-7"><a href="#cb32-7" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" tabindex="-1"></a>mod_or</span>
+<span id="cb32-9"><a href="#cb32-9" tabindex="-1"></a><span class="co">#&gt;             rn    Estimate  Std..Error     z.value   Pr...z..           or</span></span>
+<span id="cb32-10"><a href="#cb32-10" tabindex="-1"></a><span class="co">#&gt;         &lt;char&gt;       &lt;num&gt;       &lt;num&gt;       &lt;num&gt;      &lt;num&gt;        &lt;num&gt;</span></span>
+<span id="cb32-11"><a href="#cb32-11" tabindex="-1"></a><span class="co">#&gt; 1: (Intercept) -14.8881303 882.7435114 -0.01686575 0.98654372 3.421111e-07</span></span>
+<span id="cb32-12"><a href="#cb32-12" tabindex="-1"></a><span class="co">#&gt; 2:   nivolumab   0.4613151   0.2679460  1.72167184 0.08512898 1.586159e+00</span></span>
+<span id="cb32-13"><a href="#cb32-13" tabindex="-1"></a><span class="co">#&gt; 3:         sex   0.1610313   0.2516929  0.63979269 0.52230739 1.174722e+00</span></span>
+<span id="cb32-14"><a href="#cb32-14" tabindex="-1"></a><span class="co">#&gt; 4:    age18-45  12.7789374 882.7434818  0.01447639 0.98844992 3.546680e+05</span></span>
+<span id="cb32-15"><a href="#cb32-15" tabindex="-1"></a><span class="co">#&gt; 5:    age45-64  12.7361773 882.7434059  0.01442795 0.98848856 3.398220e+05</span></span>
+<span id="cb32-16"><a href="#cb32-16" tabindex="-1"></a><span class="co">#&gt; 6:    age65-74  13.1714980 882.7434060  0.01492109 0.98809513 5.251809e+05</span></span>
+<span id="cb32-17"><a href="#cb32-17" tabindex="-1"></a><span class="co">#&gt; 7:      age75+  12.6701788 882.7434335  0.01435318 0.98854821 3.181184e+05</span></span>
+<span id="cb32-18"><a href="#cb32-18" tabindex="-1"></a><span class="co">#&gt;       low_ci    up_ci        orl          ci ci_level signif_ror</span></span>
+<span id="cb32-19"><a href="#cb32-19" tabindex="-1"></a><span class="co">#&gt;        &lt;num&gt;    &lt;num&gt;     &lt;char&gt;      &lt;char&gt;   &lt;char&gt;      &lt;num&gt;</span></span>
+<span id="cb32-20"><a href="#cb32-20" tabindex="-1"></a><span class="co">#&gt; 1: 0.0000000      Inf       0.00  (0.00-Inf)      95%          0</span></span>
+<span id="cb32-21"><a href="#cb32-21" tabindex="-1"></a><span class="co">#&gt; 2: 0.9381463 2.681777       1.59 (0.94-2.68)      95%          0</span></span>
+<span id="cb32-22"><a href="#cb32-22" tabindex="-1"></a><span class="co">#&gt; 3: 0.7172881 1.923873       1.17 (0.72-1.92)      95%          0</span></span>
+<span id="cb32-23"><a href="#cb32-23" tabindex="-1"></a><span class="co">#&gt; 4: 0.0000000      Inf 354,667.99  (0.00-Inf)      95%          0</span></span>
+<span id="cb32-24"><a href="#cb32-24" tabindex="-1"></a><span class="co">#&gt; 5: 0.0000000      Inf 339,822.03  (0.00-Inf)      95%          0</span></span>
+<span id="cb32-25"><a href="#cb32-25" tabindex="-1"></a><span class="co">#&gt; 6: 0.0000000      Inf 525,180.87  (0.00-Inf)      95%          0</span></span>
+<span id="cb32-26"><a href="#cb32-26" tabindex="-1"></a><span class="co">#&gt; 7: 0.0000000      Inf 318,118.36  (0.00-Inf)      95%          0</span></span></code></pre></div>
 </div>
 </div>
 </div>

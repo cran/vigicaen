@@ -2,7 +2,7 @@
 % Please edit documentation in R/screen_drug.R
 \name{screen_drug}
 \alias{screen_drug}
-\title{Screening of Drugs}
+\title{Screening of drugs}
 \usage{
 screen_drug(.data, mp_data, freq_threshold = NULL, top_n = NULL)
 }
@@ -29,7 +29,7 @@ where the drug appears.
 The results are sorted in descending order of \code{percentage}.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 The \code{screen_drug()} function identifies and ranks the most frequently
 reported drugs (by active ingredient) in a dataset.
 }

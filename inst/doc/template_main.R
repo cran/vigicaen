@@ -41,6 +41,7 @@ link     <- link_
 out      <- out_
 followup <- followup_
 srce     <- srce_
+ind      <- ind_
 
 thg      <- thg_
 mp       <- mp_
@@ -64,6 +65,12 @@ atc_drecno <-
                vigilyze = TRUE)
 
 a_llt <- ex_$a_llt
+
+i_list <-
+ list(
+   melanoma = c("Malignant melanoma", "Metastatic malignant melanoma"),
+   lung_cancer = c("Non-small cell lung cancer", "Lung adenocarcinoma")
+   )
 
 ## ----demo_dm, eval = TRUE-----------------------------------------------------
 # ---- Deduplicating ---- ####
@@ -98,6 +105,16 @@ demo <-
   add_adr(
     a_code = a_llt,
     adr_data = adr
+  )
+
+# ---- Indications ---- ####
+
+demo <-
+  demo |>
+  add_ind(
+    i_list,
+    drug_data = drug,
+    ind_data = ind
   )
 
 # ---- Demographics ---- ####
@@ -137,7 +154,7 @@ demo <-
 demo <-
   demo |>
   mutate(
-    fup = if_else(UMCReportId %in% followup$UMCReportId, 1, 0),
+    fup = ifelse(UMCReportId %in% followup$UMCReportId, 1, 0),
     serious = 
       ifelse(
         UMCReportId %in% out$UMCReportId,

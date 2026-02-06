@@ -108,3 +108,11 @@ a_llt <-
                 smq_content)
   )
 
+# ---- Set indication terms ---- ####
+
+i_list <-
+ list(
+   melanoma = c("Malignant melanoma", "Metastatic malignant melanoma"),
+   lung_cancer = c("Non-small cell lung cancer", "Lung adenocarcinoma")
+   )
+

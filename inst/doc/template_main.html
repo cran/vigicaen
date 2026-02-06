@@ -48,8 +48,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -60,7 +61,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -437,122 +438,132 @@ the beginning of your main script.</p>
 <span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>    <span class="at">adr_data =</span> adr</span>
 <span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>  )</span>
 <span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a></span>
-<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co"># ---- Demographics ---- ####</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co"># ---- Indications ---- ####</span></span>
 <span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a></span>
-<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co"># Age, sex</span></span>
-<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a></span>
-<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
-<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
-<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">cut</span>(<span class="fu">as.integer</span>(AgeGroup),</span>
-<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a>              <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>),</span>
-<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a>              <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a>              <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;&lt;18&quot;</span>, <span class="st">&quot;18-45&quot;</span>,<span class="st">&quot;45-64&quot;</span>, <span class="st">&quot;65-74&quot;</span>, <span class="st">&quot;75+&quot;</span>)),</span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a>  <span class="fu">add_ind</span>(</span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>    i_list,</span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a>    <span class="at">drug_data =</span> drug,</span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a>    <span class="at">ind_data =</span> ind</span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a>  )</span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co"># ---- Demographics ---- ####</span></span>
 <span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a></span>
-<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">case_when</span>(Gender <span class="sc">==</span> <span class="st">&quot;1&quot;</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a>                    Gender <span class="sc">==</span> <span class="st">&quot;2&quot;</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a>                    Gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;-&quot;</span>,<span class="st">&quot;0&quot;</span>,<span class="st">&quot;9&quot;</span>) <span class="sc">~</span> <span class="cn">NA_real_</span>,</span>
-<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a>                    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_real_</span>)</span>
-<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a>  )</span>
-<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a></span>
-<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a><span class="co"># Death + outcome availability</span></span>
-<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a></span>
-<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
-<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
-<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">death =</span> </span>
-<span id="cb3-58"><a href="#cb3-58" tabindex="-1"></a>           <span class="fu">ifelse</span>(UMCReportId <span class="sc">%in%</span> out<span class="sc">$</span>UMCReportId,</span>
-<span id="cb3-59"><a href="#cb3-59" tabindex="-1"></a>                  UMCReportId <span class="sc">%in%</span> </span>
-<span id="cb3-60"><a href="#cb3-60" tabindex="-1"></a>                    (out <span class="sc">|&gt;</span> </span>
-<span id="cb3-61"><a href="#cb3-61" tabindex="-1"></a>                    <span class="fu">filter</span>(Seriousness <span class="sc">==</span> <span class="st">&quot;1&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb3-62"><a href="#cb3-62" tabindex="-1"></a>                    <span class="fu">pull</span>(UMCReportId)</span>
-<span id="cb3-63"><a href="#cb3-63" tabindex="-1"></a>                    ),</span>
-<span id="cb3-64"><a href="#cb3-64" tabindex="-1"></a>                  <span class="cn">NA</span>)</span>
-<span id="cb3-65"><a href="#cb3-65" tabindex="-1"></a>         )</span>
-<span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a></span>
-<span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a><span class="co"># follow-up, seriousness</span></span>
-<span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a></span>
-<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
-<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
-<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-72"><a href="#cb3-72" tabindex="-1"></a>    <span class="at">fup =</span> <span class="fu">if_else</span>(UMCReportId <span class="sc">%in%</span> followup<span class="sc">$</span>UMCReportId, <span class="dv">1</span>, <span class="dv">0</span>),</span>
-<span id="cb3-73"><a href="#cb3-73" tabindex="-1"></a>    <span class="at">serious =</span> </span>
-<span id="cb3-74"><a href="#cb3-74" tabindex="-1"></a>      <span class="fu">ifelse</span>(</span>
-<span id="cb3-75"><a href="#cb3-75" tabindex="-1"></a>        UMCReportId <span class="sc">%in%</span> out<span class="sc">$</span>UMCReportId,</span>
-<span id="cb3-76"><a href="#cb3-76" tabindex="-1"></a>        UMCReportId <span class="sc">%in%</span> </span>
-<span id="cb3-77"><a href="#cb3-77" tabindex="-1"></a>          (out <span class="sc">|&gt;</span> </span>
-<span id="cb3-78"><a href="#cb3-78" tabindex="-1"></a>          <span class="fu">filter</span>(Serious <span class="sc">==</span> <span class="st">&quot;Y&quot;</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb3-79"><a href="#cb3-79" tabindex="-1"></a>          <span class="fu">pull</span>(UMCReportId)</span>
-<span id="cb3-80"><a href="#cb3-80" tabindex="-1"></a>          ),</span>
-<span id="cb3-81"><a href="#cb3-81" tabindex="-1"></a>        <span class="cn">NA</span>)</span>
-<span id="cb3-82"><a href="#cb3-82" tabindex="-1"></a>  )</span>
-<span id="cb3-83"><a href="#cb3-83" tabindex="-1"></a></span>
-<span id="cb3-84"><a href="#cb3-84" tabindex="-1"></a><span class="co"># year</span></span>
-<span id="cb3-85"><a href="#cb3-85" tabindex="-1"></a></span>
-<span id="cb3-86"><a href="#cb3-86" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
-<span id="cb3-87"><a href="#cb3-87" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
-<span id="cb3-88"><a href="#cb3-88" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-89"><a href="#cb3-89" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(FirstDateDatabase, <span class="at">start =</span> <span class="dv">1</span>, <span class="at">stop =</span> <span class="dv">4</span>))</span>
-<span id="cb3-90"><a href="#cb3-90" tabindex="-1"></a>    )</span>
-<span id="cb3-91"><a href="#cb3-91" tabindex="-1"></a></span>
-<span id="cb3-92"><a href="#cb3-92" tabindex="-1"></a><span class="co"># type of reporter</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co"># Age, sex</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-52"><a href="#cb3-52" tabindex="-1"></a>    <span class="at">age =</span> <span class="fu">cut</span>(<span class="fu">as.integer</span>(AgeGroup),</span>
+<span id="cb3-53"><a href="#cb3-53" tabindex="-1"></a>              <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>,<span class="dv">8</span>),</span>
+<span id="cb3-54"><a href="#cb3-54" tabindex="-1"></a>              <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">right =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-55"><a href="#cb3-55" tabindex="-1"></a>              <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">&quot;&lt;18&quot;</span>, <span class="st">&quot;18-45&quot;</span>,<span class="st">&quot;45-64&quot;</span>, <span class="st">&quot;65-74&quot;</span>, <span class="st">&quot;75+&quot;</span>)),</span>
+<span id="cb3-56"><a href="#cb3-56" tabindex="-1"></a></span>
+<span id="cb3-57"><a href="#cb3-57" tabindex="-1"></a>    <span class="at">sex =</span> <span class="fu">case_when</span>(Gender <span class="sc">==</span> <span class="st">&quot;1&quot;</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb3-58"><a href="#cb3-58" tabindex="-1"></a>                    Gender <span class="sc">==</span> <span class="st">&quot;2&quot;</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb3-59"><a href="#cb3-59" tabindex="-1"></a>                    Gender <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;-&quot;</span>,<span class="st">&quot;0&quot;</span>,<span class="st">&quot;9&quot;</span>) <span class="sc">~</span> <span class="cn">NA_real_</span>,</span>
+<span id="cb3-60"><a href="#cb3-60" tabindex="-1"></a>                    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_real_</span>)</span>
+<span id="cb3-61"><a href="#cb3-61" tabindex="-1"></a>  )</span>
+<span id="cb3-62"><a href="#cb3-62" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" tabindex="-1"></a><span class="co"># Death + outcome availability</span></span>
+<span id="cb3-64"><a href="#cb3-64" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
+<span id="cb3-66"><a href="#cb3-66" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
+<span id="cb3-67"><a href="#cb3-67" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">death =</span> </span>
+<span id="cb3-68"><a href="#cb3-68" tabindex="-1"></a>           <span class="fu">ifelse</span>(UMCReportId <span class="sc">%in%</span> out<span class="sc">$</span>UMCReportId,</span>
+<span id="cb3-69"><a href="#cb3-69" tabindex="-1"></a>                  UMCReportId <span class="sc">%in%</span> </span>
+<span id="cb3-70"><a href="#cb3-70" tabindex="-1"></a>                    (out <span class="sc">|&gt;</span> </span>
+<span id="cb3-71"><a href="#cb3-71" tabindex="-1"></a>                    <span class="fu">filter</span>(Seriousness <span class="sc">==</span> <span class="st">&quot;1&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-72"><a href="#cb3-72" tabindex="-1"></a>                    <span class="fu">pull</span>(UMCReportId)</span>
+<span id="cb3-73"><a href="#cb3-73" tabindex="-1"></a>                    ),</span>
+<span id="cb3-74"><a href="#cb3-74" tabindex="-1"></a>                  <span class="cn">NA</span>)</span>
+<span id="cb3-75"><a href="#cb3-75" tabindex="-1"></a>         )</span>
+<span id="cb3-76"><a href="#cb3-76" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" tabindex="-1"></a><span class="co"># follow-up, seriousness</span></span>
+<span id="cb3-78"><a href="#cb3-78" tabindex="-1"></a></span>
+<span id="cb3-79"><a href="#cb3-79" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
+<span id="cb3-80"><a href="#cb3-80" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
+<span id="cb3-81"><a href="#cb3-81" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-82"><a href="#cb3-82" tabindex="-1"></a>    <span class="at">fup =</span> <span class="fu">ifelse</span>(UMCReportId <span class="sc">%in%</span> followup<span class="sc">$</span>UMCReportId, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb3-83"><a href="#cb3-83" tabindex="-1"></a>    <span class="at">serious =</span> </span>
+<span id="cb3-84"><a href="#cb3-84" tabindex="-1"></a>      <span class="fu">ifelse</span>(</span>
+<span id="cb3-85"><a href="#cb3-85" tabindex="-1"></a>        UMCReportId <span class="sc">%in%</span> out<span class="sc">$</span>UMCReportId,</span>
+<span id="cb3-86"><a href="#cb3-86" tabindex="-1"></a>        UMCReportId <span class="sc">%in%</span> </span>
+<span id="cb3-87"><a href="#cb3-87" tabindex="-1"></a>          (out <span class="sc">|&gt;</span> </span>
+<span id="cb3-88"><a href="#cb3-88" tabindex="-1"></a>          <span class="fu">filter</span>(Serious <span class="sc">==</span> <span class="st">&quot;Y&quot;</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-89"><a href="#cb3-89" tabindex="-1"></a>          <span class="fu">pull</span>(UMCReportId)</span>
+<span id="cb3-90"><a href="#cb3-90" tabindex="-1"></a>          ),</span>
+<span id="cb3-91"><a href="#cb3-91" tabindex="-1"></a>        <span class="cn">NA</span>)</span>
+<span id="cb3-92"><a href="#cb3-92" tabindex="-1"></a>  )</span>
 <span id="cb3-93"><a href="#cb3-93" tabindex="-1"></a></span>
-<span id="cb3-94"><a href="#cb3-94" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
-<span id="cb3-95"><a href="#cb3-95" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
-<span id="cb3-96"><a href="#cb3-96" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
-<span id="cb3-97"><a href="#cb3-97" tabindex="-1"></a>    srce <span class="sc">|&gt;</span> <span class="fu">transmute</span>(UMCReportId, <span class="at">type_reporter =</span> Type),</span>
-<span id="cb3-98"><a href="#cb3-98" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">&quot;UMCReportId&quot;</span>)</span>
-<span id="cb3-99"><a href="#cb3-99" tabindex="-1"></a></span>
-<span id="cb3-100"><a href="#cb3-100" tabindex="-1"></a><span class="co"># explicit multi-level vars</span></span>
+<span id="cb3-94"><a href="#cb3-94" tabindex="-1"></a><span class="co"># year</span></span>
+<span id="cb3-95"><a href="#cb3-95" tabindex="-1"></a></span>
+<span id="cb3-96"><a href="#cb3-96" tabindex="-1"></a>demo <span class="ot">&lt;-</span> </span>
+<span id="cb3-97"><a href="#cb3-97" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
+<span id="cb3-98"><a href="#cb3-98" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-99"><a href="#cb3-99" tabindex="-1"></a>    <span class="at">year =</span> <span class="fu">as.numeric</span>(<span class="fu">substr</span>(FirstDateDatabase, <span class="at">start =</span> <span class="dv">1</span>, <span class="at">stop =</span> <span class="dv">4</span>))</span>
+<span id="cb3-100"><a href="#cb3-100" tabindex="-1"></a>    )</span>
 <span id="cb3-101"><a href="#cb3-101" tabindex="-1"></a></span>
-<span id="cb3-102"><a href="#cb3-102" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
-<span id="cb3-103"><a href="#cb3-103" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
-<span id="cb3-104"><a href="#cb3-104" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-105"><a href="#cb3-105" tabindex="-1"></a>    <span class="at">Type =</span> <span class="fu">factor</span>(Type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>)),</span>
-<span id="cb3-106"><a href="#cb3-106" tabindex="-1"></a>    <span class="at">type_reporter =</span> <span class="fu">factor</span>(type_reporter,</span>
-<span id="cb3-107"><a href="#cb3-107" tabindex="-1"></a>                           <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>)),</span>
-<span id="cb3-108"><a href="#cb3-108" tabindex="-1"></a>    <span class="at">Region =</span> <span class="fu">factor</span>(Region, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>))</span>
-<span id="cb3-109"><a href="#cb3-109" tabindex="-1"></a>  )</span>
-<span id="cb3-110"><a href="#cb3-110" tabindex="-1"></a></span>
-<span id="cb3-111"><a href="#cb3-111" tabindex="-1"></a><span class="fu">levels</span>(demo<span class="sc">$</span>Type) <span class="ot">&lt;-</span></span>
-<span id="cb3-112"><a href="#cb3-112" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;Spontaneous&quot;</span>,                     </span>
-<span id="cb3-113"><a href="#cb3-113" tabindex="-1"></a>     <span class="st">&quot;Report from study&quot;</span>,                        </span>
-<span id="cb3-114"><a href="#cb3-114" tabindex="-1"></a>     <span class="st">&quot;Other&quot;</span>,   </span>
-<span id="cb3-115"><a href="#cb3-115" tabindex="-1"></a>     <span class="st">&quot;Not available to sender (unknown)&quot;</span>,   </span>
-<span id="cb3-116"><a href="#cb3-116" tabindex="-1"></a>     <span class="st">&quot;PMS/Special monitoring&quot;</span>)</span>
-<span id="cb3-117"><a href="#cb3-117" tabindex="-1"></a></span>
-<span id="cb3-118"><a href="#cb3-118" tabindex="-1"></a><span class="fu">levels</span>(demo<span class="sc">$</span>type_reporter) <span class="ot">&lt;-</span></span>
-<span id="cb3-119"><a href="#cb3-119" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;Physician&quot;</span>,</span>
-<span id="cb3-120"><a href="#cb3-120" tabindex="-1"></a>    <span class="st">&quot;Pharmacist&quot;</span>,</span>
-<span id="cb3-121"><a href="#cb3-121" tabindex="-1"></a>    <span class="st">&quot;Other Health Professional&quot;</span>,</span>
-<span id="cb3-122"><a href="#cb3-122" tabindex="-1"></a>    <span class="st">&quot;Lawyer&quot;</span>,</span>
-<span id="cb3-123"><a href="#cb3-123" tabindex="-1"></a>    <span class="st">&quot;Consumer or other non health professional&quot;</span>)</span>
-<span id="cb3-124"><a href="#cb3-124" tabindex="-1"></a></span>
-<span id="cb3-125"><a href="#cb3-125" tabindex="-1"></a><span class="fu">levels</span>(demo<span class="sc">$</span>Region) <span class="ot">&lt;-</span></span>
-<span id="cb3-126"><a href="#cb3-126" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;African Region&quot;</span>,                                    </span>
-<span id="cb3-127"><a href="#cb3-127" tabindex="-1"></a>    <span class="st">&quot;Region of the Americas&quot;</span>,                            </span>
-<span id="cb3-128"><a href="#cb3-128" tabindex="-1"></a>    <span class="st">&quot;South-East Asia Region&quot;</span>,                            </span>
-<span id="cb3-129"><a href="#cb3-129" tabindex="-1"></a>    <span class="st">&quot;European Region&quot;</span>,                                   </span>
-<span id="cb3-130"><a href="#cb3-130" tabindex="-1"></a>    <span class="st">&quot;Eastern Mediterranean Region&quot;</span>,                      </span>
-<span id="cb3-131"><a href="#cb3-131" tabindex="-1"></a>    <span class="st">&quot;Western Pacific Region&quot;</span>  </span>
-<span id="cb3-132"><a href="#cb3-132" tabindex="-1"></a>  )</span>
-<span id="cb3-133"><a href="#cb3-133" tabindex="-1"></a></span>
-<span id="cb3-134"><a href="#cb3-134" tabindex="-1"></a><span class="co"># ---- Check ---- ####</span></span>
-<span id="cb3-135"><a href="#cb3-135" tabindex="-1"></a></span>
-<span id="cb3-136"><a href="#cb3-136" tabindex="-1"></a>demo <span class="sc">|&gt;</span></span>
-<span id="cb3-137"><a href="#cb3-137" tabindex="-1"></a>  <span class="fu">check_dm</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="fu">names</span>(d_drecno), <span class="fu">names</span>(a_llt), <span class="st">&quot;fup&quot;</span>))</span>
-<span id="cb3-138"><a href="#cb3-138" tabindex="-1"></a><span class="co">#&gt;               [,1]</span></span>
-<span id="cb3-139"><a href="#cb3-139" tabindex="-1"></a><span class="co">#&gt; ipilimumab      86</span></span>
-<span id="cb3-140"><a href="#cb3-140" tabindex="-1"></a><span class="co">#&gt; atezolizumab    69</span></span>
-<span id="cb3-141"><a href="#cb3-141" tabindex="-1"></a><span class="co">#&gt; durvalumab      68</span></span>
-<span id="cb3-142"><a href="#cb3-142" tabindex="-1"></a><span class="co">#&gt; nivolumab      225</span></span>
-<span id="cb3-143"><a href="#cb3-143" tabindex="-1"></a><span class="co">#&gt; pembrolizumab  298</span></span>
-<span id="cb3-144"><a href="#cb3-144" tabindex="-1"></a><span class="co">#&gt; avelumab        43</span></span>
-<span id="cb3-145"><a href="#cb3-145" tabindex="-1"></a><span class="co">#&gt; cemiplimab      27</span></span>
-<span id="cb3-146"><a href="#cb3-146" tabindex="-1"></a><span class="co">#&gt; tremelimumab    27</span></span>
-<span id="cb3-147"><a href="#cb3-147" tabindex="-1"></a><span class="co">#&gt; a_embolism       9</span></span>
-<span id="cb3-148"><a href="#cb3-148" tabindex="-1"></a><span class="co">#&gt; a_colitis      104</span></span>
-<span id="cb3-149"><a href="#cb3-149" tabindex="-1"></a><span class="co">#&gt; a_pneumonitis  103</span></span>
-<span id="cb3-150"><a href="#cb3-150" tabindex="-1"></a><span class="co">#&gt; fup            292</span></span></code></pre></div>
+<span id="cb3-102"><a href="#cb3-102" tabindex="-1"></a><span class="co"># type of reporter</span></span>
+<span id="cb3-103"><a href="#cb3-103" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
+<span id="cb3-105"><a href="#cb3-105" tabindex="-1"></a>  demo <span class="sc">|&gt;</span></span>
+<span id="cb3-106"><a href="#cb3-106" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb3-107"><a href="#cb3-107" tabindex="-1"></a>    srce <span class="sc">|&gt;</span> <span class="fu">transmute</span>(UMCReportId, <span class="at">type_reporter =</span> Type),</span>
+<span id="cb3-108"><a href="#cb3-108" tabindex="-1"></a>    <span class="at">by =</span> <span class="st">&quot;UMCReportId&quot;</span>)</span>
+<span id="cb3-109"><a href="#cb3-109" tabindex="-1"></a></span>
+<span id="cb3-110"><a href="#cb3-110" tabindex="-1"></a><span class="co"># explicit multi-level vars</span></span>
+<span id="cb3-111"><a href="#cb3-111" tabindex="-1"></a></span>
+<span id="cb3-112"><a href="#cb3-112" tabindex="-1"></a>demo <span class="ot">&lt;-</span></span>
+<span id="cb3-113"><a href="#cb3-113" tabindex="-1"></a>  demo <span class="sc">|&gt;</span> </span>
+<span id="cb3-114"><a href="#cb3-114" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-115"><a href="#cb3-115" tabindex="-1"></a>    <span class="at">Type =</span> <span class="fu">factor</span>(Type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>)),</span>
+<span id="cb3-116"><a href="#cb3-116" tabindex="-1"></a>    <span class="at">type_reporter =</span> <span class="fu">factor</span>(type_reporter,</span>
+<span id="cb3-117"><a href="#cb3-117" tabindex="-1"></a>                           <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>)),</span>
+<span id="cb3-118"><a href="#cb3-118" tabindex="-1"></a>    <span class="at">Region =</span> <span class="fu">factor</span>(Region, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>))</span>
+<span id="cb3-119"><a href="#cb3-119" tabindex="-1"></a>  )</span>
+<span id="cb3-120"><a href="#cb3-120" tabindex="-1"></a></span>
+<span id="cb3-121"><a href="#cb3-121" tabindex="-1"></a><span class="fu">levels</span>(demo<span class="sc">$</span>Type) <span class="ot">&lt;-</span></span>
+<span id="cb3-122"><a href="#cb3-122" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;Spontaneous&quot;</span>,                     </span>
+<span id="cb3-123"><a href="#cb3-123" tabindex="-1"></a>     <span class="st">&quot;Report from study&quot;</span>,                        </span>
+<span id="cb3-124"><a href="#cb3-124" tabindex="-1"></a>     <span class="st">&quot;Other&quot;</span>,   </span>
+<span id="cb3-125"><a href="#cb3-125" tabindex="-1"></a>     <span class="st">&quot;Not available to sender (unknown)&quot;</span>,   </span>
+<span id="cb3-126"><a href="#cb3-126" tabindex="-1"></a>     <span class="st">&quot;PMS/Special monitoring&quot;</span>)</span>
+<span id="cb3-127"><a href="#cb3-127" tabindex="-1"></a></span>
+<span id="cb3-128"><a href="#cb3-128" tabindex="-1"></a><span class="fu">levels</span>(demo<span class="sc">$</span>type_reporter) <span class="ot">&lt;-</span></span>
+<span id="cb3-129"><a href="#cb3-129" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;Physician&quot;</span>,</span>
+<span id="cb3-130"><a href="#cb3-130" tabindex="-1"></a>    <span class="st">&quot;Pharmacist&quot;</span>,</span>
+<span id="cb3-131"><a href="#cb3-131" tabindex="-1"></a>    <span class="st">&quot;Other Health Professional&quot;</span>,</span>
+<span id="cb3-132"><a href="#cb3-132" tabindex="-1"></a>    <span class="st">&quot;Lawyer&quot;</span>,</span>
+<span id="cb3-133"><a href="#cb3-133" tabindex="-1"></a>    <span class="st">&quot;Consumer or other non health professional&quot;</span>)</span>
+<span id="cb3-134"><a href="#cb3-134" tabindex="-1"></a></span>
+<span id="cb3-135"><a href="#cb3-135" tabindex="-1"></a><span class="fu">levels</span>(demo<span class="sc">$</span>Region) <span class="ot">&lt;-</span></span>
+<span id="cb3-136"><a href="#cb3-136" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;African Region&quot;</span>,                                    </span>
+<span id="cb3-137"><a href="#cb3-137" tabindex="-1"></a>    <span class="st">&quot;Region of the Americas&quot;</span>,                            </span>
+<span id="cb3-138"><a href="#cb3-138" tabindex="-1"></a>    <span class="st">&quot;South-East Asia Region&quot;</span>,                            </span>
+<span id="cb3-139"><a href="#cb3-139" tabindex="-1"></a>    <span class="st">&quot;European Region&quot;</span>,                                   </span>
+<span id="cb3-140"><a href="#cb3-140" tabindex="-1"></a>    <span class="st">&quot;Eastern Mediterranean Region&quot;</span>,                      </span>
+<span id="cb3-141"><a href="#cb3-141" tabindex="-1"></a>    <span class="st">&quot;Western Pacific Region&quot;</span>  </span>
+<span id="cb3-142"><a href="#cb3-142" tabindex="-1"></a>  )</span>
+<span id="cb3-143"><a href="#cb3-143" tabindex="-1"></a></span>
+<span id="cb3-144"><a href="#cb3-144" tabindex="-1"></a><span class="co"># ---- Check ---- ####</span></span>
+<span id="cb3-145"><a href="#cb3-145" tabindex="-1"></a></span>
+<span id="cb3-146"><a href="#cb3-146" tabindex="-1"></a>demo <span class="sc">|&gt;</span></span>
+<span id="cb3-147"><a href="#cb3-147" tabindex="-1"></a>  <span class="fu">check_dm</span>(<span class="at">cols =</span> <span class="fu">c</span>(<span class="fu">names</span>(d_drecno), <span class="fu">names</span>(a_llt), <span class="st">&quot;fup&quot;</span>))</span>
+<span id="cb3-148"><a href="#cb3-148" tabindex="-1"></a><span class="co">#&gt;               [,1]</span></span>
+<span id="cb3-149"><a href="#cb3-149" tabindex="-1"></a><span class="co">#&gt; ipilimumab      86</span></span>
+<span id="cb3-150"><a href="#cb3-150" tabindex="-1"></a><span class="co">#&gt; atezolizumab    69</span></span>
+<span id="cb3-151"><a href="#cb3-151" tabindex="-1"></a><span class="co">#&gt; durvalumab      68</span></span>
+<span id="cb3-152"><a href="#cb3-152" tabindex="-1"></a><span class="co">#&gt; nivolumab      225</span></span>
+<span id="cb3-153"><a href="#cb3-153" tabindex="-1"></a><span class="co">#&gt; pembrolizumab  298</span></span>
+<span id="cb3-154"><a href="#cb3-154" tabindex="-1"></a><span class="co">#&gt; avelumab        43</span></span>
+<span id="cb3-155"><a href="#cb3-155" tabindex="-1"></a><span class="co">#&gt; cemiplimab      27</span></span>
+<span id="cb3-156"><a href="#cb3-156" tabindex="-1"></a><span class="co">#&gt; tremelimumab    27</span></span>
+<span id="cb3-157"><a href="#cb3-157" tabindex="-1"></a><span class="co">#&gt; a_embolism       9</span></span>
+<span id="cb3-158"><a href="#cb3-158" tabindex="-1"></a><span class="co">#&gt; a_colitis      104</span></span>
+<span id="cb3-159"><a href="#cb3-159" tabindex="-1"></a><span class="co">#&gt; a_pneumonitis  103</span></span>
+<span id="cb3-160"><a href="#cb3-160" tabindex="-1"></a><span class="co">#&gt; fup            292</span></span></code></pre></div>
 </div>
 <div id="link" class="section level2">
 <h2>Link</h2>

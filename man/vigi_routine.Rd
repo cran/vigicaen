@@ -2,7 +2,7 @@
 % Please edit documentation in R/vigi_routine.R
 \name{vigi_routine}
 \alias{vigi_routine}
-\title{Pharmacovigilance routine function}
+\title{Display routine pharmacovigilance summary}
 \usage{
 vigi_routine(
   demo_data,
@@ -68,7 +68,7 @@ If you provide a case_tto value, it is represented by the red line, and the
 label.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} \code{vigi_routine()} draws
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#maturing}{\figure{lifecycle-maturing.svg}{options: alt='[Maturing]'}}}{\strong{[Maturing]}} \code{vigi_routine()} draws
 an Information Component plot and
 a Time to Onset plot for a given drug-adr pair.
 }
@@ -80,7 +80,7 @@ years value, respectively.
 The function only works if there is one item in \code{d_code} and \code{a_code}.
 If you are working on a specific case, you can provide a \code{case_tto} value.
 This value will be displayed on the Time to Onset plot.
-If you're demo table was filtered on specific cases (e.g. older adults,
+If your demo table was filtered on specific cases (e.g. older adults,
 a subset of all drugs), then you may want to indicate this setting on the
 plot legend, with arg \code{analysis_setting}.
 }
@@ -98,7 +98,8 @@ a_llt <-
 
 # But you could also use get_drecno() and get_llt_soc()
 
-# load tables demo, drug, adr, and link
+# load tables demo, drug, adr, and link (real tables with
+# open_dataset() or dt_parquet("x", in_memory = FALSE))
 
 demo <- demo_
 adr  <- adr_

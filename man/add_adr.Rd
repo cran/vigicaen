@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_adr.R
 \name{add_adr}
 \alias{add_adr}
-\title{Add ADR column(s) to a dataset}
+\title{Add adverse drug reaction column(s) to a dataset}
 \usage{
 add_adr(
   .data,
@@ -34,7 +34,7 @@ or "this row correspond to this adr", if \code{.data} is \code{adr} or \code{lin
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}Creates adr columns
-in vigibase datasets (demo, link, drug, but also adr).
+in vigibase datasets (demo, link, drug, and adr).
 }
 \details{
 Low-level term codes are the preferred level of requesting in

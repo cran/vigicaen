@@ -199,6 +199,28 @@ demo <-
 demo |> 
   check_dm("a_colitis")
 
+## ----i_list-------------------------------------------------------------------
+# You need ind and drug, plus the table you will be working on, here demo.
+ind <- ind_
+
+i_list <-
+  list2(
+    melanoma = c("Malignant melanoma", "Metastatic malignant melanoma")
+  )
+
+## ----add_ind_modal_case-------------------------------------------------------
+demo <- 
+  add_ind(
+    .data = demo,
+    i_list = i_list,
+    drug_data = drug,
+    ind_data  = ind
+    )
+
+## ----check_dm_ind-------------------------------------------------------------
+demo |> 
+  desc_facvar("melanoma")
+
 ## ----age----------------------------------------------------------------------
 demo <-
   demo |>

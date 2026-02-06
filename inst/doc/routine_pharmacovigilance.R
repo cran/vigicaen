@@ -18,7 +18,7 @@ path_meddra <- "~/meddra/"
 # adr  <- dt_parquet(path_base, "adr", in_memory = FALSE)
 # link <- dt_parquet(path_base, "link", in_memory = FALSE)
 # 
-# mp <- dt_parquet(path_who,  "mp")
+# mp     <- dt_parquet(path_who,    "mp")
 # meddra <- dt_parquet(path_meddra, "meddra_hierarchy")
 
 ## ----load_example_tables------------------------------------------------------

@@ -2,7 +2,7 @@
 % Please edit documentation in R/screen_adr.R
 \name{screen_adr}
 \alias{screen_adr}
-\title{Screening of Adverse Drug Reactions}
+\title{Screening of adverse drug reactions}
 \arguments{
 \item{.data, }{An \code{adr} data.table. See \code{\link{adr_}}}
 
@@ -35,7 +35,7 @@ where the term appears.
 The results are sorted in descending order of \code{percentage}.
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#stable}{\figure{lifecycle-stable.svg}{options: alt='[Stable]'}}}{\strong{[Stable]}}
 Identify and rank the
 most frequently reported adverse drug reaction (ADR) terms
 in a dataset, based on a specified MedDRA term level.
